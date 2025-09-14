@@ -1,0 +1,20 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Фон космоса -->
+  <rect width="512" height="512" fill="#0A0A1A"/>
+  
+  <!-- Магический круг -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="#4A00E0" stroke-width="12"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#8A2BE2" stroke-width="8"/>
+  
+  <!-- Стихии -->
+  <circle cx="256" cy="156" r="30" fill="#8A2BE2"/> <!-- Воздух -->
+  <circle cx="356" cy="256" r="30" fill="#4A00E0"/> <!-- Вода -->
+  <circle cx="256" cy="356" r="30" fill="#00D4AA"/> <!-- Земля -->
+  <circle cx="156" cy="256" r="30" fill="#E25822"/> <!-- Огонь -->
+  
+  <!-- Центральный кристалл -->
+  <polygon points="256,186 286,246 256,306 226,246" fill="white"/>
+  
+  <!-- Текст -->
+  <text x="256" y="450" text-anchor="middle" fill="white" font-family="Arial" font-size="24">BAURUM</text>
+</svg>

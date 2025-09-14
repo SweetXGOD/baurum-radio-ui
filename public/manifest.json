@@ -1,0 +1,26 @@
+{
+  "name": "Baurum Radio - Магические частоты",
+  "short_name": "Baurum Radio", 
+  "description": "Погрузись в мир магических частот и преобразуй своё сознание",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0A0A1A",
+  "theme_color": "#4A00E0",
+  "orientation": "any",
+  "categories": ["health", "lifestyle", "music"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png", 
+      "purpose": "any maskable"
+    }
+  ]
+}
