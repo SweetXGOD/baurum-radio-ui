@@ -31,7 +31,44 @@
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- Добавляем проверку API -->
+    <div id="api-status" style="display: none; position: fixed; top: 10px; right: 10px; background: #ff4444; color: white; padding: 10px; border-radius: 5px; z-index: 9999;">
+      API сервер недоступен
+    </div>
+
     <script type="module" src="/src/main.jsx"></script>
+    
+    <script>
+      // Проверка доступности API при загрузке
+      window.addEventListener('load', async () => {
+        try {
+          const response = await fetch('http://localhost:8000/', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            console.log('✅ API сервер доступен');
+          } else {
+            showApiError();
+          }
+        } catch (error) {
+          console.error('❌ API сервер недоступен:', error);
+          showApiError();
+        }
+      });
+
+      function showApiError() {
+        const statusEl = document.getElementById('api-status');
+        if (statusEl) {
+          statusEl.style.display = 'block';
+          statusEl.textContent = 'API сервер недоступен. Запустите python api_server.py';
+        }
+      }
+    </script>
     
     <style>
       /* Убираем встроенный лоадер Vite */
@@ -43,12 +80,72 @@
       /* Предотвращаем белый экран при загрузке */
       body {
         background-color: #000000 !important;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
       }
       
       /* Скрываем всё пока не загрузится React */
       #root:empty {
         display: none;
       }
+      
+      /* Стили для лоадера */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-family: Arial, sans-serif;
+        z-index: 1000;
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #333;
+        border-top: 4px solid #4A00E0;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
     </style>
+    
+    <!-- Лоадер пока загружается приложение -->
+    <div id="loading" class="loading-screen">
+      <div class="spinner"></div>
+      <div>Загрузка Baurum Radio...</div>
+    </div>
+    
+    <script>
+      // Скрываем лоадер когда React загрузится
+      window.addEventListener('DOMContentLoaded', () => {
+        const root = document.getElementById('root');
+        const loading = document.getElementById('loading');
+        
+        if (root && loading) {
+          const observer = new MutationObserver((mutations) => {
+            if (root.children.length > 0) {
+              loading.style.display = 'none';
+              observer.disconnect();
+            }
+          });
+          
+          observer.observe(root, { childList: true });
+        }
+      });
+    </script>
   </body>
 </html>
