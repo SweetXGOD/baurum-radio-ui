@@ -1,5 +1,5 @@
 // API для связи с Python-ядром
-const API_URL = 'https://baurumcoin.com'  // ИЛИ ваш API URL
+const API_URL = 'http://localhost:8000'  // ← ИЗМЕНИТЬ НА localhost
 
 export const api = {
   // Запуск воспроизведения для выбранной стихии
