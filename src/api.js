@@ -1,5 +1,5 @@
 // API для связи с Python-ядром
-const API_URL = 'http://localhost:8000'  // ← ИЗМЕНИТЬ НА localhost
+const API_URL = 'https://baurum.onrender.com'  // ← ИЗМЕНИТЬ НА localhost
 
 export const api = {
   // Запуск воспроизведения для выбранной стихии
