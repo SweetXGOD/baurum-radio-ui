@@ -24,6 +24,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Baurum Radio">
+
+    <!-- Base URL -->
+    <base href="https://baurumcoin.com/">
   </head>
   <body>
     <div id="root"></div>
@@ -57,39 +60,89 @@
         };
       }
 
-      // Проверяем загрузку React
-      let reactLoaded = false;
-      let checkTimer = null;
-
+      // Более надежная проверка загрузки React
       function checkReactLoaded() {
-        if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined') {
-          reactLoaded = true;
-          clearInterval(checkTimer);
+        // Проверяем разные способы загрузки React
+        const reactLoaded = (
+          typeof React !== 'undefined' ||
+          typeof window.React !== 'undefined' ||
+          document.querySelector('[data-reactroot]')
+        );
+        
+        if (reactLoaded) {
           console.log('✅ React loaded successfully');
-        } else if (typeof window !== 'undefined' && window.React && window.ReactDOM) {
-          reactLoaded = true;
-          clearInterval(checkTimer);
-          console.log('✅ React loaded successfully (window)');
+          hideLoader();
+          return true;
         }
+        return false;
       }
 
-      // Запускаем проверку
-      window.addEventListener('load', function() {
-        checkTimer = setInterval(checkReactLoaded, 100);
-        
-        // Таймаут на случай если React не загрузится
-        setTimeout(function() {
-          if (!reactLoaded) {
-            clearInterval(checkTimer);
-            console.error('❌ React failed to load');
-            // Показываем сообщение пользователю
-            const errorDiv = document.createElement('div');
-            errorDiv.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: red; color: white; padding: 20px; z-index: 10000;';
-            errorDiv.innerHTML = 'Ошибка загрузки приложения. Попробуйте обновить страницу.';
-            document.body.appendChild(errorDiv);
+      // Пробуем несколько раз проверить загрузку
+      let attempts = 0;
+      const maxAttempts = 20;
+      const checkInterval = setInterval(() => {
+        attempts++;
+        if (checkReactLoaded() || attempts >= maxAttempts) {
+          clearInterval(checkInterval);
+          if (attempts >= maxAttempts) {
+            showReactError();
           }
-        }, 10000);
-      });
+        }
+      }, 500);
+
+      function showReactError() {
+        console.error('❌ React failed to load after timeout');
+        hideLoader();
+        
+        // Показываем сообщение об ошибке
+        const errorDiv = document.createElement('div');
+        errorDiv.innerHTML = `
+          <div style="
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: rgba(0,0,0,0.9); 
+            color: white; 
+            padding: 30px; 
+            border-radius: 15px;
+            text-align: center;
+            z-index: 10000;
+            border: 2px solid #4A00E0;
+            max-width: 80%;
+          ">
+            <h2 style="margin: 0 0 15px 0; color: #8A2BE2;">🚫 Ошибка загрузки</h2>
+            <p style="margin: 0 0 20px 0;">Приложение не загрузилось. Попробуйте:</p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <button onclick="window.location.reload()" style="padding: 10px; background: #4A00E0; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                🔄 Обновить страницу
+              </button>
+              <button onclick="clearCacheAndReload()" style="padding: 10px; background: #6A0DAD; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                🗑️ Очистить кэш и обновить
+              </button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(errorDiv);
+      }
+
+      function clearCacheAndReload() {
+        // Пытаемся очистить кэш
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            for (let name of names) caches.delete(name);
+          });
+        }
+        // Принудительная перезагрузка
+        window.location.reload(true);
+      }
+
+      function hideLoader() {
+        const loading = document.getElementById('loading');
+        if (loading) {
+          loading.style.display = 'none';
+        }
+      }
 
       // Проверка доступности API при загрузке
       window.addEventListener('load', async () => {
