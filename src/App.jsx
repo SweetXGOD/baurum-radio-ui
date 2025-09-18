@@ -12,6 +12,7 @@ import { PlayerControls } from './components/PlayerControls'
 import { MusicVisualizer } from './components/MusicVisualizer'
 import { useState } from 'react'
 import { api } from './api'
+import { useDirectAudio } from './hooks/useDirectAudio'
 
 function App({ isMobile = false }) {
   const [selectedElement, setSelectedElement] = useState(null)
@@ -20,6 +21,9 @@ function App({ isMobile = false }) {
   const [cameraPosition, setCameraPosition] = useState([0, 1, 7])
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTrack, setCurrentTrack] = useState('Космическая магия')
+  
+  // Хук для прямого воспроизведения
+  const { playElementAudio, stopAudio } = useDirectAudio()
 
   // Адаптивные настройки
   const cameraFov = isMobile ? 60 : 75
@@ -49,39 +53,37 @@ function App({ isMobile = false }) {
     setWavesColor(getElementColor(element))
     
     try {
-      // ВСЕГДА останавливаем текущее воспроизведение перед запуском нового
+      // Останавливаем текущее воспроизведение
       if (isPlaying) {
         console.log('⏹️ Останавливаем текущее воспроизведение...')
-        await api.stopFrequency()
-        // Даем время серверу обработать остановку
+        await stopAudio()
         await new Promise(resolve => setTimeout(resolve, 100))
       }
       
-      // Запускаем новую частоту
-      console.log(`🎵 Запускаем новую частоту: ${element}`)
-      const result = await api.startFrequency(element)
-      console.log('Результат генерации:', result)
+      // Запускаем новую музыку напрямую в браузере
+      console.log(`🎵 Запускаем музыку: ${element}`)
+      const result = await playElementAudio(element)
+      console.log('Результат воспроизведения:', result)
       
       setIsPlaying(true)
       
     } catch (error) {
       console.error('Ошибка:', error)
-      // Даже если ошибка, обновляем состояние
-      setIsPlaying(true)
+      setIsPlaying(false)
     }
   }
 
   const handleTogglePlay = async () => {
     if (isPlaying) {
       try {
-        await api.stopFrequency()
+        await stopAudio()
         setIsPlaying(false)
       } catch (error) {
         console.error('Ошибка остановки:', error)
       }
     } else if (selectedElement) {
       try {
-        await api.startFrequency(selectedElement)
+        await playElementAudio(selectedElement)
         setIsPlaying(true)
       } catch (error) {
         console.error('Ошибка запуска:', error)

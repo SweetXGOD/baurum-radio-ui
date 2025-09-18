@@ -77,6 +77,13 @@
         return false;
       }
 
+      function hideLoader() {
+        const loading = document.getElementById('loading');
+        if (loading) {
+          loading.style.display = 'none';
+        }
+      }
+
       // Пробуем несколько раз проверить загрузку
       let attempts = 0;
       const maxAttempts = 20;
@@ -85,64 +92,11 @@
         if (checkReactLoaded() || attempts >= maxAttempts) {
           clearInterval(checkInterval);
           if (attempts >= maxAttempts) {
-            showReactError();
+            console.error('❌ React failed to load after timeout');
+            hideLoader();
           }
         }
       }, 500);
-
-      function showReactError() {
-        console.error('❌ React failed to load after timeout');
-        hideLoader();
-        
-        // Показываем сообщение об ошибке
-        const errorDiv = document.createElement('div');
-        errorDiv.innerHTML = `
-          <div style="
-            position: fixed; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            background: rgba(0,0,0,0.9); 
-            color: white; 
-            padding: 30px; 
-            border-radius: 15px;
-            text-align: center;
-            z-index: 10000;
-            border: 2px solid #4A00E0;
-            max-width: 80%;
-          ">
-            <h2 style="margin: 0 0 15px 0; color: #8A2BE2;">🚫 Ошибка загрузки</h2>
-            <p style="margin: 0 0 20px 0;">Приложение не загрузилось. Попробуйте:</p>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <button onclick="window.location.reload()" style="padding: 10px; background: #4A00E0; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                🔄 Обновить страницу
-              </button>
-              <button onclick="clearCacheAndReload()" style="padding: 10px; background: #6A0DAD; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                🗑️ Очистить кэш и обновить
-              </button>
-            </div>
-          </div>
-        `;
-        document.body.appendChild(errorDiv);
-      }
-
-      function clearCacheAndReload() {
-        // Пытаемся очистить кэш
-        if ('caches' in window) {
-          caches.keys().then(function(names) {
-            for (let name of names) caches.delete(name);
-          });
-        }
-        // Принудительная перезагрузка
-        window.location.reload(true);
-      }
-
-      function hideLoader() {
-        const loading = document.getElementById('loading');
-        if (loading) {
-          loading.style.display = 'none';
-        }
-      }
 
       // Проверка доступности API при загрузке
       window.addEventListener('load', async () => {
@@ -175,7 +129,7 @@
     </script>
     
     <style>
-      /* Убираем встроенный лоадер Vite */
+      /* Убираем встроный лоадер Vite */
       #vite-dev-loading,
       .vite-dev-loading {
         display: none !important;
