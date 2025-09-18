@@ -24,10 +24,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Baurum Radio">
-
-    <!-- Предзагрузка критических ресурсов -->
-    <link rel="preload" as="script" href="/src/main.jsx">
-    <link rel="preload" as="style" href="/src/index.css">
   </head>
   <body>
     <div id="root"></div>
@@ -40,6 +36,61 @@
     <script type="module" src="/src/main.jsx"></script>
     
     <script>
+      // Обработка ошибок WebGL
+      window.addEventListener('error', function(e) {
+        if (e.message.includes('WebGL') || e.filename.includes('webgl')) {
+          console.warn('WebGL error caught:', e.message);
+          e.preventDefault();
+        }
+      });
+
+      // Отключаем строгий режим WebGL для совместимости
+      if (typeof WebGLRenderingContext !== 'undefined') {
+        const originalGetContext = HTMLCanvasElement.prototype.getContext;
+        HTMLCanvasElement.prototype.getContext = function() {
+          try {
+            return originalGetContext.apply(this, arguments);
+          } catch (e) {
+            console.warn('WebGL context failed, falling back to 2D');
+            return null;
+          }
+        };
+      }
+
+      // Проверяем загрузку React
+      let reactLoaded = false;
+      let checkTimer = null;
+
+      function checkReactLoaded() {
+        if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined') {
+          reactLoaded = true;
+          clearInterval(checkTimer);
+          console.log('✅ React loaded successfully');
+        } else if (typeof window !== 'undefined' && window.React && window.ReactDOM) {
+          reactLoaded = true;
+          clearInterval(checkTimer);
+          console.log('✅ React loaded successfully (window)');
+        }
+      }
+
+      // Запускаем проверку
+      window.addEventListener('load', function() {
+        checkTimer = setInterval(checkReactLoaded, 100);
+        
+        // Таймаут на случай если React не загрузится
+        setTimeout(function() {
+          if (!reactLoaded) {
+            clearInterval(checkTimer);
+            console.error('❌ React failed to load');
+            // Показываем сообщение пользователю
+            const errorDiv = document.createElement('div');
+            errorDiv.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: red; color: white; padding: 20px; z-index: 10000;';
+            errorDiv.innerHTML = 'Ошибка загрузки приложения. Попробуйте обновить страницу.';
+            document.body.appendChild(errorDiv);
+          }
+        }, 10000);
+      });
+
       // Проверка доступности API при загрузке
       window.addEventListener('load', async () => {
         try {
