@@ -10,7 +10,11 @@ export default defineConfig({
       '4c5c9b0a468700d8aeaede9f016e9fd9.serveo.net',
       'localhost',
       '127.0.0.1',
-      '192.168.0.103'
+      '192.168.0.103',
+      'baurum-radio-ui.onrender.com'  // ← ДОБАВЬТЕ ЭТУ СТРОЧКУ
     ]
+  },
+  preview: {
+    allowedHosts: ['baurum-radio-ui.onrender.com']  // ← И ЭТУ СЕКЦИЮ ДОБАВЬТЕ
   }
 })
